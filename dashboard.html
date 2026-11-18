@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Painel de Gestão - Troca Limpa</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      background: #081408;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .dash-navbar {
+      background: rgba(10, 26, 10, 0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--dark-border);
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .dash-user-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .user-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(77, 168, 58, 0.15);
+      border: 1px solid rgba(77, 168, 58, 0.3);
+      padding: 6px 14px;
+      border-radius: 100px;
+      font-size: 0.85rem;
+      color: var(--green-300);
+      font-weight: 600;
+    }
+    .btn-sair {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #fca5a5;
+      padding: 8px 16px;
+      border-radius: 100px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+    .btn-sair:hover {
+      background: rgba(239, 68, 68, 0.3);
+      color: #fff;
+    }
+    .dash-main {
+      flex: 1;
+      max-width: 1240px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 36px 24px 80px;
+    }
+    .dash-nav-tabs {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 28px;
+      border-bottom: 1px solid var(--dark-border);
+      padding-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .dash-tab-btn {
+      padding: 12px 24px;
+      border-radius: var(--radius-md);
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      background: transparent;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all var(--transition);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .dash-tab-btn:hover {
+      color: var(--green-300);
+      background: rgba(77, 168, 58, 0.08);
+    }
+    .dash-tab-btn.active {
+      background: linear-gradient(135deg, var(--green-700), var(--green-500));
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(77, 168, 58, 0.3);
+    }
+    .dash-section {
+      display: none;
+      animation: fadeIn 0.4s ease;
+    }
+    .dash-section.active {
+      display: block;
+    }
+
+    /* Modal / Banner de Senha Provisória */
+    .banner-senha-provisoria {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(15, 34, 16, 0.9));
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      border-radius: var(--radius-lg);
+      padding: 20px 24px;
+      margin-bottom: 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .banner-senha-provisoria div strong {
+      color: #fcd34d;
+      font-size: 1rem;
+      display: block;
+      margin-bottom: 4px;
+    }
+    .banner-senha-provisoria div span {
+      color: var(--text-secondary);
+      font-size: 0.88rem;
+    }
+
+    /* Form Card */
+    .condo-form-card {
+      background: var(--dark-card);
+      border: 1px solid var(--dark-border);
+      border-radius: var(--radius-xl);
+      padding: 32px;
+      margin-bottom: 36px;
+      box-shadow: var(--shadow-card);
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+    }
+    .access-box {
+      background: rgba(77, 168, 58, 0.08);
+      border: 1px dashed rgba(109, 191, 62, 0.35);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      margin-top: 20px;
+    }
+    .access-box-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--green-300);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Cards de Condomínio */
+    .condo-list-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+    }
+    .condo-item-card {
+      background: var(--dark-card);
+      border: 1px solid var(--dark-border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      position: relative;
+      transition: all var(--transition);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .condo-item-card:hover {
+      border-color: rgba(109, 191, 62, 0.4);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-green);
+    }
+    .condo-title-wrap {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 14px;
+    }
+    .condo-nome {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .condo-badge-status {
+      padding: 4px 10px;
+      border-radius: 100px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      background: rgba(109, 191, 62, 0.15);
+      color: var(--green-300);
+      border: 1px solid rgba(109, 191, 62, 0.3);
+    }
+    .condo-data-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      margin-bottom: 18px;
+    }
+    .condo-data-list strong {
+      color: var(--text-primary);
+    }
+    .condo-login-info {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      margin-bottom: 16px;
+      font-size: 0.82rem;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .condo-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+    .btn-delete-condo {
+      background: transparent;
+      color: #f87171;
+      border: 1px solid rgba(248, 113, 113, 0.2);
+      border-radius: var(--radius-sm);
+      padding: 6px 12px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+    .btn-delete-condo:hover {
+      background: rgba(248, 113, 113, 0.15);
+      border-color: #f87171;
+    }
+    .empty-state {
+      text-align: center;
+      padding: 48px 20px;
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: var(--radius-lg);
+      border: 1px dashed var(--dark-border);
+      color: var(--text-muted);
+    }
+
+    /* Modal Trocar Senha */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(10px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.active {
+      display: flex;
+    }
+    .modal-content {
+      background: var(--dark-card);
+      border: 1px solid var(--dark-border);
+      border-radius: var(--radius-xl);
+      padding: 36px;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar Dashboard -->
+  <header class="dash-navbar">
+    <a href="index.html" class="nav-logo">
+      <div class="logo-icon-svg" style="color:var(--green-400);">&#9850;</div>
+      <span class="logo-text">TROCA<span class="logo-accent">LIMPA</span></span>
+    </a>
+    <div class="dash-user-info">
+      <div class="user-badge" id="user-badge">
+        <span>&#128100;</span>
+        <span id="user-display-email">Carregando...</span>
+      </div>
+      <a href="admin.html" id="link-ir-admin" class="btn btn-outline" style="display:none; padding:6px 14px; font-size:0.82rem; background:rgba(77,168,58,0.15); border-color:var(--green-400); color:var(--green-300);">
+        &#9881; Painel do Administrador
+      </a>
+      <button class="btn btn-outline" id="btn-abrir-troca-senha" style="padding:6px 14px; font-size:0.82rem;">
+        Alterar Senha
+      </button>
+      <a href="index.html" class="btn btn-outline" style="padding:6px 14px; font-size:0.82rem;">Ver Site</a>
+      <button class="btn-sair" id="btn-logout">Sair</button>
+    </div>
+  </header>
+
+  <!-- Conteúdo Principal -->
+  <main class="dash-main">
+    
+    <!-- Banner de Troca de Senha Provisória (Exibido para usuários recém-criados) -->
+    <div class="banner-senha-provisoria" id="banner-provisoria" style="display:none;">
+      <div>
+        <strong>&#128273; Você está utilizando uma senha provisória!</strong>
+        <span>Recomendamos que você defina sua senha definitiva pessoal agora mesmo para maior segurança.</span>
+      </div>
+      <button class="btn btn-primary" id="btn-banner-alterar" style="padding:8px 18px; font-size:0.88rem;">
+        Definir Minha Senha
+      </button>
+    </div>
+
+    <!-- Navegação de Abas -->
+    <div class="dash-nav-tabs">
+      <button class="dash-tab-btn active" id="tab-btn-condos">
+        <span>&#127963;</span> Banco de Condomínios & Síndicos
+      </button>
+      <button class="dash-tab-btn" id="tab-btn-fin">
+        <span>&#128176;</span> Plano Financeiro Oficial (Restrito)
+      </button>
+    </div>
+
+    <!-- SEÇÃO 1: BANCO DE DADOS & CADASTRO DE CONDOMÍNIOS -->
+    <section class="dash-section active" id="section-condos">
+      
+      <!-- Formulário exclusivo do Administrador -->
+      <div class="condo-form-card" id="card-form-admin">
+        <h2 style="font-size: 1.4rem; font-weight: 800; color: var(--text-primary); margin-bottom: 6px;">
+          Cadastrar Novo Condomínio & Gerar Acesso do Síndico
+        </h2>
+        <p style="font-size: 0.92rem; color: var(--text-secondary); margin-bottom: 24px;">
+          Cadastre as informações da parceria e gere automaticamente a senha provisória para o síndico acessar o painel.
+        </p>
+
+        <form id="form-novo-condominio">
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label" for="condo-nome">Nome do Condomínio *</label>
+              <input type="text" id="condo-nome" class="form-input" placeholder="Ex: Residencial Jardins" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="condo-cnpj">CNPJ</label>
+              <input type="text" id="condo-cnpj" class="form-input" placeholder="00.000.000/0001-00" />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="condo-sindico">Nome do Síndico *</label>
+              <input type="text" id="condo-sindico" class="form-input" placeholder="Nome completo do síndico" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="condo-contato">Contato do Síndico (WhatsApp) *</label>
+              <input type="text" id="condo-contato" class="form-input" placeholder="(47) 9 0000-0000" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="condo-qtd-ap">Qtd de Apartamentos (Qtd de AP) *</label>
+              <input type="number" id="condo-qtd-ap" class="form-input" placeholder="Ex: 96" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="condo-qtd-blocos">Qtd de Blocos / Torres</label>
+              <input type="text" id="condo-qtd-blocos" class="form-input" placeholder="Ex: 3 Blocos / 2 Torres" />
+            </div>
+          </div>
+          <div class="form-group" style="margin-top: 12px;">
+            <label class="form-label" for="condo-endereco">Endereço Completo</label>
+            <input type="text" id="condo-endereco" class="form-input" placeholder="Rua, número, bairro, cidade - UF" />
+          </div>
+
+          <!-- Caixa de Acesso & Senha Provisória -->
+          <div class="access-box">
+            <div class="access-box-title">
+              <span>&#128273;</span> Credenciais de Acesso Provisório para o Síndico
+            </div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label" for="sindico-login-email">E-mail de Login do Síndico *</label>
+                <input type="email" id="sindico-login-email" class="form-input" placeholder="sindico@condominio.com" required />
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="sindico-senha-provisoria">Senha Provisória (mínimo 6 dígitos) *</label>
+                <div style="display:flex; gap:8px;">
+                  <input type="text" id="sindico-senha-provisoria" class="form-input" placeholder="Ex: Troca123" minlength="6" required />
+                  <button type="button" id="btn-gerar-senha" class="btn btn-outline" style="padding:10px 14px; font-size:0.8rem; white-space:nowrap;">
+                    Gerar Auto
+                  </button>
+                </div>
+              </div>
+            </div>
+            <p style="font-size:0.8rem; color:var(--text-muted); margin-top:8px;">
+              Ao cadastrar, a conta do síndico será criada com esta senha provisória. No primeiro acesso, o síndico criará sua própria senha definitiva.
+            </p>
+          </div>
+
+          <div style="display:flex; justify-content:flex-end; margin-top:24px;">
+            <button type="submit" class="btn btn-primary" id="btn-salvar-condo">
+              <span>+</span> Cadastrar Condomínio & Criar Acesso
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Listagem de Condomínios -->
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+          <h3 style="font-size:1.3rem; font-weight:700; color:var(--text-primary);">
+            Condomínios Registrados (<span id="total-condos-count">0</span>)
+          </h3>
+          <span class="section-tag" style="margin:0; font-size:0.75rem;">Selo Troca Limpa</span>
+        </div>
+        <div id="condos-list-container" class="condo-list-grid">
+          <div class="empty-state">Carregando lista de condomínios...</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 2: PLANO FINANCEIRO RESTRITO -->
+    <section class="dash-section" id="section-fin">
+      <div class="section-header" style="text-align: left; margin-bottom: 32px;">
+        <span class="section-tag">Acesso Exclusivo</span>
+        <h2 class="section-title" style="font-size: 2.2rem;">Plano de Negócio & <span class="text-green">Análise Financeira</span></h2>
+        <p class="section-desc" style="margin: 0; max-width: 100%;">
+          Dados estratégicos reservados para a gestão da Troca Limpa e investidores credenciados.
+        </p>
+      </div>
+
+      <!-- KPIs Financeiros -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <span class="kpi-label">Investimento Inicial</span>
+          <span class="kpi-value">R$ 48.900</span>
+          <span class="kpi-desc">Equipamentos, filtragem e capital de giro</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-label">Receita Bruta Anual</span>
+          <span class="kpi-value">R$ 446.520</span>
+          <span class="kpi-desc">R$ 37.210,00 mensais consolidados</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-label">Resultado Operacional</span>
+          <span class="kpi-value">R$ 92.561</span>
+          <span class="kpi-desc">Lucro operacional comprovado no Ano 1</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-label">Payback Estimado</span>
+          <span class="kpi-value">6 a 12 meses</span>
+          <span class="kpi-desc">~20% margem líquida após liquidação</span>
+        </div>
+      </div>
+
+      <!-- Tabela 1: Fontes de Receita -->
+      <div class="tabela-card">
+        <h3 class="tabela-titulo">Demonstrativo de Receitas (Ano 1)</h3>
+        <p class="tabela-subtitulo">Composição detalhada dos 3 pilares de monetização</p>
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>Origem</th>
+              <th>Volume Projetado</th>
+              <th class="text-right">Receita Mensal</th>
+              <th class="text-right">Receita Anual</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Venda de Sabão Líquido (Frascos 2L)</strong><br /><small style="color:var(--text-muted)">R$ 11,00 / frasco de 2L | Custo R$ 6,45/L</small></td>
+              <td>3.000 frascos/mês</td>
+              <td class="text-right">R$ 33.000,00</td>
+              <td class="text-right badge-valor">R$ 396.000,00</td>
+            </tr>
+            <tr>
+              <td><strong>Selo Troca Limpa (Condomínios)</strong><br /><small style="color:var(--text-muted)">Mensalidade R$ 200,00 por condomínio</small></td>
+              <td>14 condomínios</td>
+              <td class="text-right">R$ 2.800,00</td>
+              <td class="text-right badge-valor">R$ 33.600,00</td>
+            </tr>
+            <tr>
+              <td><strong>Venda de Óleo Excedente p/ Biodiesel</strong><br /><small style="color:var(--text-muted)">Valor estimado em R$ 3,00 / litro</small></td>
+              <td>470 litros/mês (~5.000L/ano)</td>
+              <td class="text-right">R$ 1.410,00</td>
+              <td class="text-right badge-valor">R$ 16.920,00</td>
+            </tr>
+            <tr class="total-row">
+              <td>RECEITA BRUTA TOTAL</td>
+              <td>-</td>
+              <td class="text-right">R$ 37.210,00</td>
+              <td class="text-right">R$ 446.520,00</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Tabela 2: DRE Completo -->
+      <div class="tabela-card">
+        <h3 class="tabela-titulo">Demonstrativo de Resultado do Exercício (DRE Operacional)</h3>
+        <p class="tabela-subtitulo">Balanço das saídas e lucratividade líquida anual</p>
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>Item / Classificação Contábil</th>
+              <th class="text-right">Valor Anual (R$)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong style="color:var(--accent-lime);">(+) Receita Bruta Total</strong></td>
+              <td class="text-right badge-valor">R$ 446.520,00</td>
+            </tr>
+            <tr>
+              <td>(-) Custos Variáveis (Insumos p/ 6.000L de sabão, frascos, lauril, etc.)</td>
+              <td class="text-right" style="color:#ff8a80;">- R$ 232.200,00</td>
+            </tr>
+            <tr>
+              <td>(-) Despesas Operacionais (Combustível, coletas e despesas administrativas)</td>
+              <td class="text-right" style="color:#ff8a80;">- R$ 85.740,00</td>
+            </tr>
+            <tr>
+              <td>(-) Custos Fixos (Aluguel R$ 3k/mês, energia, água, contabilidade, internet, impostos)</td>
+              <td class="text-right" style="color:#ff8a80;">- R$ 37.200,00</td>
+            </tr>
+            <tr class="total-row">
+              <td>(=) RESULTADO OPERACIONAL LÍQUIDO DO ANO 1</td>
+              <td class="text-right badge-valor" style="font-size:1.15rem;">R$ 92.561,40</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Tabela 3: Investimentos Iniciais -->
+      <div class="tabela-card">
+        <h3 class="tabela-titulo">Investimentos Iniciais Necessários: R$ 48.900,00</h3>
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th class="text-right">Valor (R$)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Equipamento para filtragem e armazenamento</td><td class="text-right">R$ 16.000,00</td></tr>
+            <tr><td>Reserva inicial de capital de giro</td><td class="text-right">R$ 18.000,00</td></tr>
+            <tr><td>Misturador de sabão 200L</td><td class="text-right">R$ 6.000,00</td></tr>
+            <tr><td>Recipientes de coleta (14 tambores/bombonas x R$ 300,00)</td><td class="text-right">R$ 4.200,00</td></tr>
+            <tr><td>Criação de site e redes sociais</td><td class="text-right">R$ 2.000,00</td></tr>
+            <tr><td>Material de divulgação (banners, panfletos, cartões)</td><td class="text-right">R$ 1.500,00</td></tr>
+            <tr><td>Abertura e registro da empresa (MEI/ME)</td><td class="text-right">R$ 800,00</td></tr>
+            <tr><td>Kit de produção de sabão (caldeirão, moldes, EPIs)</td><td class="text-right">R$ 400,00</td></tr>
+            <tr class="total-row">
+              <td>TOTAL DE INVESTIMENTOS</td>
+              <td class="text-right">R$ 48.900,00</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal para Alterar Senha Definitiva -->
+  <div class="modal-overlay" id="modal-troca-senha">
+    <div class="modal-content">
+      <h3 style="font-size:1.3rem; font-weight:700; color:var(--text-primary); margin-bottom:8px;">
+        Definir Senha Definitiva
+      </h3>
+      <p style="font-size:0.88rem; color:var(--text-secondary); margin-bottom:20px;">
+        Crie uma nova senha de sua preferência para seus próximos acessos.
+      </p>
+      <form id="form-alterar-senha">
+        <div class="form-group">
+          <label class="form-label" for="nova-senha">Nova Senha (mínimo 6 caracteres)</label>
+          <input type="password" id="nova-senha" class="form-input" placeholder="••••••••" minlength="6" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="confirma-nova-senha">Confirmar Nova Senha</label>
+          <input type="password" id="confirma-nova-senha" class="form-input" placeholder="••••••••" minlength="6" required />
+        </div>
+        <div id="modal-feedback" style="display:none; padding:10px; border-radius:6px; font-size:0.85rem; margin-bottom:16px;"></div>
+        <div style="display:flex; justify-content:flex-end; gap:12px;">
+          <button type="button" class="btn btn-outline" id="btn-fechar-modal-senha" style="padding:10px 20px;">Cancelar</button>
+          <button type="submit" class="btn btn-primary" id="btn-salvar-nova-senha" style="padding:10px 20px;">Salvar Senha</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script type="module">
+    import { 
+      auth, 
+      db, 
+      signOut, 
+      onAuthStateChanged,
+      criarUsuarioSecundario,
+      updatePassword,
+      collection,
+      addDoc,
+      getDocs,
+      deleteDoc,
+      doc,
+      getDoc,
+      setDoc,
+      updateDoc,
+      serverTimestamp
+    } from "./firebase-config.js";
+
+    const userEmailSpan = document.getElementById("user-display-email");
+    const btnLogout = document.getElementById("btn-logout");
+    const tabBtnCondos = document.getElementById("tab-btn-condos");
+    const tabBtnFin = document.getElementById("tab-btn-fin");
+    const sectionCondos = document.getElementById("section-condos");
+    const sectionFin = document.getElementById("section-fin");
+    const formNovoCondo = document.getElementById("form-novo-condominio");
+    const condosListContainer = document.getElementById("condos-list-container");
+    const totalCondosCount = document.getElementById("total-condos-count");
+    const btnGerarSenha = document.getElementById("btn-gerar-senha");
+    const inputSenhaProvisoria = document.getElementById("sindico-senha-provisoria");
+    
+    // Modal & Troca de Senha
+    const bannerProvisoria = document.getElementById("banner-provisoria");
+    const modalTrocaSenha = document.getElementById("modal-troca-senha");
+    const btnAbrirTrocaSenha = document.getElementById("btn-abrir-troca-senha");
+    const btnBannerAlterar = document.getElementById("btn-banner-alterar");
+    const btnFecharModalSenha = document.getElementById("btn-fechar-modal-senha");
+    const formAlterarSenha = document.getElementById("form-alterar-senha");
+    const modalFeedback = document.getElementById("modal-feedback");
+
+    let currentUser = null;
+    let currentUserData = null;
+
+    // Monitorar Autenticação
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = "login.html";
+      } else {
+        currentUser = user;
+        userEmailSpan.textContent = user.email;
+        
+        // Verificar se usuário tem status de senha provisória
+        await checarPerfilUsuario(user);
+        carregarCondominios();
+      }
+    });
+
+    async function checarPerfilUsuario(user) {
+      try {
+        const userDoc = await getDoc(doc(db, "usuarios", user.uid));
+        const linkAdmin = document.getElementById("link-ir-admin");
+        if (userDoc.exists()) {
+          currentUserData = userDoc.data();
+          if (currentUserData.senha_provisoria === true) {
+            bannerProvisoria.style.display = "flex";
+          } else {
+            bannerProvisoria.style.display = "none";
+          }
+          if (currentUserData.perfil !== "sindico") {
+            if (linkAdmin) linkAdmin.style.display = "inline-flex";
+          }
+        } else {
+          // Se não tem perfil definido, trata como admin
+          if (linkAdmin) linkAdmin.style.display = "inline-flex";
+        }
+      } catch (e) {
+        console.warn("Sem registro na coleção usuarios:", e);
+      }
+    }
+
+    // Gerador de Senha Provisória Automática
+    btnGerarSenha.addEventListener("click", () => {
+      const chars = "ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789";
+      let autoSenha = "TL-";
+      for (let i = 0; i < 6; i++) {
+        autoSenha += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      inputSenhaProvisoria.value = autoSenha;
+    });
+
+    // Logout
+    btnLogout.addEventListener("click", async () => {
+      try {
+        await signOut(auth);
+        window.location.href = "login.html";
+      } catch (e) {
+        console.error(e);
+      }
+    });
+
+    // Alternar Abas
+    tabBtnCondos.addEventListener("click", () => {
+      tabBtnCondos.classList.add("active");
+      tabBtnFin.classList.remove("active");
+      sectionCondos.classList.add("active");
+      sectionFin.classList.remove("active");
+    });
+
+    tabBtnFin.addEventListener("click", () => {
+      tabBtnFin.classList.add("active");
+      tabBtnCondos.classList.remove("active");
+      sectionFin.classList.add("active");
+      sectionCondos.classList.remove("active");
+    });
+
+    // Abrir/Fechar Modal de Senha
+    function abrirModalSenha() {
+      modalFeedback.style.display = "none";
+      formAlterarSenha.reset();
+      modalTrocaSenha.classList.add("active");
+    }
+    btnAbrirTrocaSenha.addEventListener("click", abrirModalSenha);
+    btnBannerAlterar.addEventListener("click", abrirModalSenha);
+    btnFecharModalSenha.addEventListener("click", () => {
+      modalTrocaSenha.classList.remove("active");
+    });
+
+    // Ação: Salvar Nova Senha Definitiva
+    formAlterarSenha.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const n1 = document.getElementById("nova-senha").value;
+      const n2 = document.getElementById("confirma-nova-senha").value;
+
+      if (n1 !== n2) {
+        exibirFeedbackModal("As senhas não coincidem.", true);
+        return;
+      }
+      if (n1.length < 6) {
+        exibirFeedbackModal("A senha deve ter no mínimo 6 dígitos.", true);
+        return;
+      }
+
+      const btnSalvar = document.getElementById("btn-salvar-nova-senha");
+      btnSalvar.textContent = "Atualizando...";
+      btnSalvar.disabled = true;
+
+      try {
+        await updatePassword(auth.currentUser, n1);
+        
+        // Atualiza no Firestore marcando que a senha não é mais provisória
+        await setDoc(doc(db, "usuarios", auth.currentUser.uid), {
+          senha_provisoria: false,
+          senha_alterada_em: new Date().toISOString()
+        }, { merge: true });
+
+        bannerProvisoria.style.display = "none";
+        exibirFeedbackModal("Senha definitiva cadastrada com sucesso!", false);
+        setTimeout(() => {
+          modalTrocaSenha.classList.remove("active");
+          btnSalvar.textContent = "Salvar Senha";
+          btnSalvar.disabled = false;
+        }, 1200);
+      } catch (err) {
+        console.error(err);
+        let msg = "Erro ao atualizar senha.";
+        if (err.code === "auth/requires-recent-login") {
+          msg = "Para trocar a senha, faça login novamente.";
+        }
+        exibirFeedbackModal(msg, true);
+        btnSalvar.textContent = "Salvar Senha";
+        btnSalvar.disabled = false;
+      }
+    });
+
+    function exibirFeedbackModal(msg, isError) {
+      modalFeedback.textContent = msg;
+      modalFeedback.style.display = "block";
+      modalFeedback.style.background = isError ? "rgba(239, 68, 68, 0.2)" : "rgba(77, 168, 58, 0.2)";
+      modalFeedback.style.color = isError ? "#fca5a5" : "var(--green-300)";
+      modalFeedback.style.border = "1px solid " + (isError ? "rgba(239, 68, 68, 0.4)" : "rgba(109, 191, 62, 0.4)");
+    }
+
+    // Ação: Cadastrar Novo Condomínio + Criar Usuário Secundário com Senha Provisória
+    formNovoCondo.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById("btn-salvar-condo");
+      btn.textContent = "Cadastrando e gerando acesso...";
+      btn.disabled = true;
+
+      const emailSindico = document.getElementById("sindico-login-email").value.trim();
+      const senhaProvisoria = document.getElementById("sindico-senha-provisoria").value.trim();
+      const nomeCondo = document.getElementById("condo-nome").value.trim();
+      const nomeSindico = document.getElementById("condo-sindico").value.trim();
+
+      try {
+        // 1. Cria a conta no Firebase Auth para o síndico usando a instância secundária
+        let novoUser = null;
+        try {
+          novoUser = await criarUsuarioSecundario(emailSindico, senhaProvisoria);
+          
+          // Registra no Firestore que este usuário possui senha provisória
+          await setDoc(doc(db, "usuarios", novoUser.uid), {
+            nome: nomeSindico,
+            email: emailSindico,
+            perfil: "sindico",
+            condominio: nomeCondo,
+            senha_provisoria: true,
+            criado_em: new Date().toISOString()
+          });
+        } catch (authErr) {
+          console.warn("Aviso ao criar usuário no Auth (pode já existir):", authErr);
+        }
+
+        // 2. Salva o condomínio na coleção 'condominios'
+        const novoCondo = {
+          nome: nomeCondo,
+          cnpj: document.getElementById("condo-cnpj").value.trim() || "Não informado",
+          sindico: nomeSindico,
+          contato: document.getElementById("condo-contato").value.trim(),
+          sindico_email: emailSindico,
+          senha_provisoria_gerada: senhaProvisoria,
+          qtd_ap: document.getElementById("condo-qtd-ap").value.trim(),
+          qtd_blocos: document.getElementById("condo-qtd-blocos").value.trim() || "1 Bloco / Torre",
+          endereco: document.getElementById("condo-endereco").value.trim() || "Joinville - SC",
+          criado_em: serverTimestamp()
+        };
+
+        await addDoc(collection(db, "condominios"), novoCondo);
+
+        alert(`Condomínio cadastrado com sucesso!\n\nDados de acesso para o Síndico:\nE-mail: ${emailSindico}\nSenha Provisória: ${senhaProvisoria}\n\nO síndico poderá alterar a senha ao entrar.`);
+        formNovoCondo.reset();
+        await carregarCondominios();
+      } catch (error) {
+        console.error("Erro ao salvar:", error);
+        alert("Erro ao cadastrar condomínio: " + error.message);
+      } finally {
+        btn.innerHTML = "<span>+</span> Cadastrar Condomínio & Criar Acesso";
+        btn.disabled = false;
+      }
+    });
+
+    // Listar Condomínios do Firestore
+    async function carregarCondominios() {
+      try {
+        const querySnapshot = await getDocs(collection(db, "condominios"));
+        totalCondosCount.textContent = querySnapshot.size;
+
+        if (querySnapshot.empty) {
+          condosListContainer.innerHTML = `
+            <div class="empty-state" style="grid-column: 1 / -1;">
+              Nenhum condomínio parceiro cadastrado ainda. Preencha o formulário acima para registrar o primeiro.
+            </div>
+          `;
+          return;
+        }
+
+        let html = "";
+        querySnapshot.forEach((docSnap) => {
+          const c = docSnap.data();
+          const docId = docSnap.id;
+          html += `
+            <div class="condo-item-card">
+              <div>
+                <div class="condo-title-wrap">
+                  <h4 class="condo-nome">${escapeHtml(c.nome)}</h4>
+                  <span class="condo-badge-status">Selo Ativo</span>
+                </div>
+                <div class="condo-data-list">
+                  <div><strong>CNPJ:</strong> ${escapeHtml(c.cnpj)}</div>
+                  <div><strong>Síndico:</strong> ${escapeHtml(c.sindico)}</div>
+                  <div><strong>Contato:</strong> ${escapeHtml(c.contato)}</div>
+                  <div><strong>Endereço:</strong> ${escapeHtml(c.endereco)}</div>
+                  <div><strong>Qtd de AP:</strong> ${escapeHtml(c.qtd_ap)} apartamentos</div>
+                  <div><strong>Blocos/Torres:</strong> ${escapeHtml(c.qtd_blocos)}</div>
+                </div>
+
+                ${c.sindico_email ? `
+                  <div class="condo-login-info">
+                    <div><strong>Login Síndico:</strong> ${escapeHtml(c.sindico_email)}</div>
+                    <div><strong>Senha Provisória:</strong> <code style="color:var(--accent-lime);">${escapeHtml(c.senha_provisoria_gerada || '***')}</code></div>
+                  </div>
+                ` : ''}
+              </div>
+              <div class="condo-actions">
+                <button class="btn-delete-condo" data-id="${docId}">Remover Condomínio</button>
+              </div>
+            </div>
+          `;
+        });
+
+        condosListContainer.innerHTML = html;
+
+        // Eventos de exclusão
+        document.querySelectorAll(".btn-delete-condo").forEach((btn) => {
+          btn.addEventListener("click", async (e) => {
+            const id = e.target.getAttribute("data-id");
+            if (confirm("Deseja realmente remover este condomínio do banco de dados?")) {
+              await deleteDoc(doc(db, "condominios", id));
+              carregarCondominios();
+            }
+          });
+        });
+      } catch (error) {
+        console.error("Erro ao carregar:", error);
+        condosListContainer.innerHTML = `
+          <div class="empty-state" style="grid-column: 1 / -1; color:#fca5a5;">
+            Aviso de permissão no banco de dados. Verifique a conexão com o servidor.
+          </div>
+        `;
+      }
+    }
+
+    function escapeHtml(str) {
+      if (!str) return "";
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+  </script>
+</body>
+</html>

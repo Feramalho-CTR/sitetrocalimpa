@@ -1,4 +1,4 @@
-﻿// ===================== NAVBAR SCROLL =====================
+// ===================== NAVBAR SCROLL =====================
 const navbar = document.getElementById("navbar");
 const hamburger = document.getElementById("hamburger");
 const navLinks = document.getElementById("nav-links");
@@ -120,6 +120,18 @@ document.querySelectorAll(".mvv-tab-btn").forEach(btn => {
     document.querySelectorAll(".mvv-panel").forEach(p => p.classList.remove("active"));
     btn.classList.add("active");
     const panel = document.getElementById("panel-" + tab);
+    if (panel) panel.classList.add("active");
+  });
+});
+
+// ===================== FINANCEIRO TABS =====================
+document.querySelectorAll(".fin-tab-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const tab = btn.getAttribute("data-fintab");
+    document.querySelectorAll(".fin-tab-btn").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".fin-tab-panel").forEach(p => p.classList.remove("active"));
+    btn.classList.add("active");
+    const panel = document.getElementById("fin-panel-" + tab);
     if (panel) panel.classList.add("active");
   });
 });
